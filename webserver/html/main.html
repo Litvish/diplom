@@ -1,0 +1,27 @@
+{{ define "title" }}Домашняя страница{{ end }}
+{{ define "main" }}
+<div class="main_section_1">
+    <div class="profile_button profile_main">
+        <span class="circle-image">
+            <img src="\static\img\avatar.png">
+        </span>
+    </div>
+    <div class="main_nickname">
+        <a>AAAAA</a>
+    </div>
+</div>
+<div class="main_section_2">
+    {{ range .Patients }}
+    <div class="main_container">
+        <div class="main_container_nickname">
+            <span class="circle-image">
+                <img src="{{ .AvatarURL }}" alt="Аватар">
+            </span>
+            <div>
+            <h3>{{ .Name }}</h3>
+            <p>{{ .Disease }}</p>
+        </div>
+    </div>
+    {{ end }}
+</div>
+{{ end }}

@@ -1,0 +1,66 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{{ block "title" . }}Default Title{{ end }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preload" href="/static/fonts/nunito-v26-cyrillic_latin-regular.woff2" as="font" crossorigin>
+</head>
+<body>    
+   <!-- навигация -->
+    <nav class="navigation">
+        <div class="navigation_section_1">
+            <div class="navigation_logo">
+                <h1 href="/">
+                    Logo
+                </h1>
+            </div>
+        </div>
+        <ul class="navigation_list">
+            <li class="navigation_item"><button class="navigation_button navigation_button_active">Профиль</button>
+            </li>
+            <li class="navigation_item"><button id="patientsButton"  class="navigation_button">Пациенты</button>
+            </li>
+            <li class="navigation_item"><button class="navigation_button">Печать</button>
+            </li>
+            <li class="navigation_item"><button class="navigation_button">Игры</button>
+            </li>
+            <li class="navigation_item"><button class="navigation_button">Настройки</button>
+            </li>
+        </ul>
+        <div class="navigation_section_3">
+            <button class="navigation_search_button">
+                <svg id="search" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z"
+                        stroke="#2F3437" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M20.9999 21L16.6499 16.65" stroke="#2F3437" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </button>
+            <button class="profile_button navigation_profile">
+                <span class="circle-image">
+                    <img src="/static/img/avatar.png">
+                </span>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 9L12 15L18 9" stroke="#2F3437" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </button>
+        </div>
+
+        </div>
+    </nav>
+    <!-- подгрузка main -->
+    <main>
+        {{ template "main" . }}
+        
+    </main>
+    <script>
+        document.getElementById('patientsButton').addEventListener('click', function() {
+            window.location.href = '/add-patient';
+        });
+    </script>
+</body>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simple Racing Game</title>
+<style>
+  body {
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+  }
+  #gameContainer {
+    position: relative;
+    display: inline-block;
+    margin-top: 20px;
+  }
+  #gameInfo {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  canvas {
+    background-color: #444;
+    border: 1px solid black;
+  }
+  #startButton, #gameOver {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    z-index: 10; /* Устанавливаем z-index выше, чем у canvas */
+  }
+  #gameOver {
+    background-color: transparent;
+    color: red;
+    font-size: 24px;
+    display: none; /* Изначально скрыт */
+  }
+  #speedControl {
+    width: 80%;
+  }
+  #endGameMessage {
+    display: none;
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    padding: 20px;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    text-align: center;
+    border-radius: 10px;
+    z-index: 10;
+  }
+  #endGameMessage p {
+    margin: 10px 0;
+  }
+  #endGameMessage button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #333;
+    color: white;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+  }
+</style>
+</head>
+<body>
+<div id="gameInfo">
+  <div id="score">Очки: 0</div>
+  <div id="timer">Время: 0</div>
+  <label for="speedControl" style="display: inline-block;">Скорость квадратов:</label>
+  <input type="range" id="speedControl" min="1" max="10" value="3">
+</div>
+<div id="gameContainer">
+    <canvas id="gameCanvas"></canvas>
+    <button id="startButton">Начать игру</button>
+    <div id="endGameMessage">
+      <p>Ты молодец!</p>
+      <p id="finalScore">Очки: 0</p>
+      <p id="finalTime">Время: 0</p>
+      <button onclick="startGame()">Начать заново</button>
+    </div>
+  </div>
+<script>
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const startButton = document.getElementById('startButton');
+  const gameOverText = document.getElementById('gameOver');
+  const scoreDiv = document.getElementById('score');
+  const speedControl = document.getElementById('speedControl');
+
+  canvas.width = 800;
+  canvas.height = 600;
+
+  const laneWidth = canvas.width / 3;
+  const lanes = [laneWidth / 2, laneWidth * 1.5, laneWidth * 2.5];
+  let currentLane = 1;
+  let carX = lanes[currentLane];
+  let carY = canvas.height - 100;
+  let carWidth = 50;
+  let carHeight = 100;
+  let obstacles = [];
+  let obstacleSpeed = parseInt(speedControl.value);
+  let obstacleWidth = carWidth;
+  let obstacleHeight = carHeight;
+  let frameCount = 0;
+  let score = 0;
+  let gameRunning = false;
+  let targetX = carX; // Целевая X-координата для плавного движения
+  let baseObstacleSpeed = 3; // Базовая скорость препятствий
+let speedIncrease = 0.005; // Увеличение скорости препятствий за кадр
+const timerDiv = document.getElementById('timer');
+  let startTime;
+  let elapsedTime = 0;
+  function updateTimer() {
+    elapsedTime = Date.now() - startTime;
+    timerDiv.innerText = `Время: ${(elapsedTime / 1000).toFixed(1)}`;
+  }
+  function drawRoad() {
+    // Рисуем штриховые линии для разделения полос
+    ctx.strokeStyle = '#FFF';
+    ctx.lineWidth = 5;
+    ctx.setLineDash([20, 20]);
+    for (let i = 1; i <= 2; i++) {
+      ctx.beginPath();
+      ctx.moveTo(laneWidth * i, 0);
+      ctx.lineTo(laneWidth * i, canvas.height);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+  }
+
+  function drawCar() {
+    ctx.beginPath();
+    ctx.ellipse(carX, carY, carWidth / 2, carHeight / 2, 0, 0, Math.PI * 2);
+    ctx.fillStyle = 'blue';
+    ctx.fill();
+    ctx.closePath();
+  }
+
+  function drawObstacle(x, y) {
+    ctx.fillStyle = 'red';
+    ctx.fillRect(x - obstacleWidth / 2, y, obstacleWidth, obstacleHeight);
+  }
+
+  function addObstacle(offsetY = 0) {
+  let laneIndex = Math.floor(Math.random() * lanes.length);
+  let x = lanes[laneIndex];
+  obstacles.push({ x: x, y: -obstacleHeight - offsetY, speed: obstacleSpeed });
+}
+
+function updateObstacles() {
+  for (let i = obstacles.length - 1; i >= 0; i--) {
+    // Обновляем положение каждого препятствия в зависимости от его скорости
+    obstacles[i].y += obstacles[i].speed;
+    if (obstacles[i].y > canvas.height) {
+      obstacles.splice(i, 1);
+      score++;
+      updateScore();
+    } else if (obstacles[i].y + obstacleHeight > carY - carHeight / 2 &&
+               Math.abs(obstacles[i].x - carX) < carWidth / 2 + obstacleWidth / 2) {
+      // Столкновение
+      gameOver();
+    }
+  }
+}
+
+  function updateScore() {
+    scoreDiv.innerText = `Очки: ${score}`;
+  }
+
+  function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  function updateGame() {
+  if (!gameRunning) return;
+  clearCanvas();
+  drawRoad();
+  drawCar();
+  obstacles.forEach(obstacle => drawObstacle(obstacle.x, obstacle.y));
+  updateObstacles();
+
+  // Плавное и быстрое движение овала
+  if (carX !== targetX) {
+    carX += (targetX - carX) / 5; // Увеличиваем скорость плавного изменения координаты X
+  }
+
+  frameCount++;
+  let obstacleRate = Math.max(30, 120 - Math.floor(score / 10)); // Уменьшаем интервал появления препятствий
+  if (frameCount % obstacleRate === 0) {
+    let numberOfObstaclesToAdd = 1 + Math.floor(score / 100); // Увеличиваем количество препятствий
+    for (let i = 0; i < numberOfObstaclesToAdd; i++) {
+      // Добавляем случайное смещение по Y для каждого препятствия
+      let offsetY = i * obstacleHeight * 1.5; // Смещение, чтобы препятствия не появлялись одновременно
+      addObstacle(-offsetY);
+    }
+  }
+
+  // Увеличиваем скорость препятствий со временем
+  baseObstacleSpeed += speedIncrease;
+  obstacleSpeed = baseObstacleSpeed + parseInt(speedControl.value);
+  updateTimer();
+
+  requestAnimationFrame(updateGame);
+}
+  document.addEventListener('keydown', function(event) {
+    if (!gameRunning) return;
+    if (event.key === 'ArrowLeft' && currentLane > 0) {
+      currentLane--;
+      targetX = lanes[currentLane]; // Обновляем целевую X-координату
+    } else if (event.key === 'ArrowRight' && currentLane < lanes.length - 1) {
+      currentLane++;
+      targetX = lanes[currentLane]; // Обновляем целевую X-координату
+    }
+  });
+
+  function startGame() {
+    document.getElementById('endGameMessage').style.display = 'none';
+    startButton.style.display = 'none'; // Скрываем кнопку "Начать игру"
+  obstacles = [];
+  score = 0;
+  frameCount = 0;
+  gameRunning = true;
+  updateScore();
+  baseObstacleSpeed = 3; // Сброс базовой скорости препятствий
+  obstacleSpeed = baseObstacleSpeed + parseInt(speedControl.value);
+  startTime = Date.now(); // Запоминаем время начала игры
+    speedControl.disabled = true; // Делаем ползунок неактивным
+
+  // Добавляем начальное количество препятствий с случайным смещением по Y
+  let initialObstacles = 2; // Установите желаемое начальное количество препятствий
+  for (let i = 0; i < initialObstacles; i++) {
+    // Случайное смещение по Y, чтобы препятствия появлялись в разное время
+    let offsetY = Math.random() * canvas.height * 0.5; // Смещение до половины высоты холста
+    addObstacle(-offsetY);
+  }
+
+  updateGame();
+}
+
+  function gameOver() {
+    gameRunning = false;
+    document.getElementById('endGameMessage').style.display = 'block';
+    document.getElementById('finalScore').textContent = `Очки: ${score}`;
+    document.getElementById('finalTime').textContent = `Время: ${(elapsedTime / 1000).toFixed(1)} сек`;
+    speedControl.disabled = false; // Снова делаем ползунок активным
+  
+  }
+
+  startButton.addEventListener('click', startGame);
+  speedControl.addEventListener('input', function() {
+    obstacleSpeed = parseInt(this.value);
+  });
+
+
+  // Показываем кнопку "Начать игру" при загрузке страницы
+  window.onload = function() {
+    document.getElementById('startButton').style.display = 'block';
+  };
+  startButton.addEventListener('click', startGame);
+</script>
+</body>
+</html>

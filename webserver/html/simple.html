@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Page</title>
+</head>
+<body>
+    <h1>Patients List</h1>
+    {{ range .Patients }}
+    <div>
+        <h2>{{ .Name }}</h2>
+        <p>Disease: {{ .Disease }}</p>
+    </div>
+    {{ end }}
+</body>
+</html>
