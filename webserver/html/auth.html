@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preload" href="/static/fonts/nunito-v26-cyrillic_latin-regular.woff2" as="font" crossorigin>
+    <style>
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+    <h1>Аутефикация</h1>
+    <form action="/auth" method="post">
+        <label for="surname">Surname:</label>
+        <input type="text" id="surname" name="surname" required>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        
+        <input type="submit" name="Вход">
+        {{ if .error }}
+        <p class="error-message">{{ .error }}</p>
+        {{ end }}
+    </form>
+</body>
+</html>

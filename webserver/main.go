@@ -1,8 +1,6 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -21,45 +19,8 @@ type Patient struct {
 	AvatarURL       string
 }
 
-func initDB(connStr string) (*sql.DB, error) {
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		return nil, fmt.Errorf("ошибка при подключении к базе данных: %w", err)
-	}
-	if err = db.Ping(); err != nil {
-		return nil, fmt.Errorf("не удалось подключиться к базе данных: %w", err)
-	}
-	var version string
-	if err = db.QueryRow("SELECT version()").Scan(&version); err != nil {
-		return nil, fmt.Errorf("ошибка при выполнении запроса: %w", err)
-	}
-	fmt.Println("Успешное подключение к базе данных! Версия сервера PostgreSQL:", version)
-	return db, nil
-}
-
-func getPatients(db *sql.DB) ([]Patient, error) {
-	var patients []Patient
-	query := `SELECT id, name, disease, avatar_url FROM patients`
-	rows, err := db.Query(query)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var p Patient
-		if err := rows.Scan(&p.ID, &p.Name, &p.Disease, &p.AvatarURL); err != nil {
-			return nil, err
-		}
-		patients = append(patients, p)
-	}
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-	return patients, nil
-}
-
 func main() {
-	connStr := "host=localhost port=5433 user=admin dbname=webapp password=a123123 sslmode=disable"
+	connStr := "host=localhost port=5433 user=admin dbname=webapp password=a123123	 sslmode=disable"
 	db, err := initDB(connStr)
 	if err != nil {
 		log.Fatal(err)
@@ -71,14 +32,82 @@ func main() {
 	// Загрузка шаблонов
 	router.LoadHTMLGlob("html/*.html")
 
-	router.GET("/", func(c *gin.Context) {
+	router.GET("/", AuthMiddleware(), func(c *gin.Context) {
+		Claims := c.MustGet("userInfo").(*Claims)
+
 		patients, err := getPatients(db)
 		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
+			// c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 		c.HTML(http.StatusOK, "template.html", gin.H{
-			"Patients": patients,
+			"UserSurname": Claims.Surname,
+			"UserName":    Claims.Name,
+			"Patients":    patients,
+			"content":     "main",
+			"Title":       "Dashboard",
+		})
+	})
+	router.GET("/auth", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "auth.html", nil)
+	})
+
+	router.POST("/auth", func(c *gin.Context) {
+		var loginCreds struct {
+			Surname  string `form:"surname"`
+			Name     string `form:"name"`
+			Password string `form:"password"`
+		}
+		if err := c.ShouldBind(&loginCreds); err != nil {
+			c.HTML(http.StatusBadRequest, "auth.html", gin.H{"error": "Invalid form input"})
+			return
+		}
+
+		// Проверяем учетные данные пользователя
+		match, err := CheckUserPassword(db, loginCreds.Surname, loginCreds.Name, loginCreds.Password)
+		if err != nil {
+			c.HTML(http.StatusInternalServerError, "auth.html", gin.H{"error": "Неверные данные"})
+
+			return
+		}
+
+		if !match {
+			c.HTML(http.StatusUnauthorized, "auth.html", gin.H{"error": "Неверные данные"})
+			return
+		}
+
+		// Учетные данные верны, генерируем JWT токен
+		tokenString, err := GenerateJWT(loginCreds.Surname, loginCreds.Name)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+			return
+		}
+
+		// Устанавливаем токен в куки (или заголовок, если нужно)
+		c.SetCookie("token", tokenString, 3600, "/", "", false, true)
+
+		// Перенаправляем пользователя на главную страницу
+		c.Redirect(http.StatusFound, "/")
+	})
+	router.GET("/game", AuthMiddleware(), func(c *gin.Context) {
+
+		c.HTML(http.StatusOK, "template.html", gin.H{
+			"Title":   "Game Page",
+			"Content": "game",
+		})
+	})
+	router.GET("/patient", AuthMiddleware(), func(c *gin.Context) {
+
+		c.HTML(http.StatusOK, "template.html", gin.H{
+			"Title":   "patients",
+			"Content": "table",
+		})
+	})
+	router.GET("/add-patient", AuthMiddleware(), func(c *gin.Context) {
+
+		c.HTML(http.StatusOK, "template.html", gin.H{
+			"Title":   "добавить пациента",
+			"Content": "add",
 		})
 	})
 
@@ -90,4 +119,5 @@ func main() {
 	if err := router.Run(":8080"); err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
+
 }

@@ -3,13 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{{define "game-content"}}
 <title>Simple Racing Game</title>
 <style>
   body {
     text-align: center;
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
+    font-family: nunito, sans-serif;
+    
   }
   #gameContainer {
     position: relative;
@@ -18,7 +20,7 @@
   }
   #gameInfo {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-evenly;
     align-items: center;
     margin-bottom: 10px;
   }
@@ -79,6 +81,7 @@
     border-radius: 5px;
   }
 </style>
+<link rel="preload" href="/static/fonts/nunito-v26-cyrillic_latin-regular.woff2" as="font" crossorigin>
 </head>
 <body>
 <div id="gameInfo">
@@ -278,3 +281,5 @@ function updateObstacles() {
 </script>
 </body>
 </html>
+
+{{end}}

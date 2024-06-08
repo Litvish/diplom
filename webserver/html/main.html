@@ -1,14 +1,15 @@
-{{ define "title" }}Домашняя страница{{ end }}
 {{ define "main" }}
 <div class="main_section_1">
     <div class="profile_button profile_main">
         <span class="circle-image">
             <img src="\static\img\avatar.png">
         </span>
+        
     </div>
     <div class="main_nickname">
-        <a>AAAAA</a>
+        <a>Dr.{{.UserSurname}} {{.UserName}}</a>
     </div>
+    <button class="green-button" id="addButton">Добавить пациента</button>
 </div>
 <div class="main_section_2">
     {{ range .Patients }}
@@ -23,5 +24,9 @@
         </div>
     </div>
     {{ end }}
+    
+    <script>document.getElementById('addButton').addEventListener('click', function () {
+        window.location.href = '/add-patient';   
+    });</script>
 </div>
 {{ end }}

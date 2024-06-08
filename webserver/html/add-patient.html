@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    {{define "add"}}
+<head>
+  <title>Регистрация</title>
+</head>
+<body>
+<h1>Добавить пациента</h1>
+  <form>
+    <label for="name">Имя:</label><br>
+    <input type="text" id="name" name="name" ><br>
+
+    <label for="surname">Фамилия:</label><br>
+    <input type="text" id="surname" name="surname" ><br>
+
+    <label for="Disease">Болезнь:</label><br>
+    <input type="text" id="text" name="Disease" value=""><br>
+
+    <label for="AttendingDoctor">Лечащий врач</label><br>
+    <input type="text" id="AttendingDoctor" name="AttendingDoctor" value=""><br>
+
+    <input type="submit" value="Регистрация">
+  </form>
+ 
+</body>
+{{end}}
+</html>

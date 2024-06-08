@@ -1,14 +1,15 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <title>{{ block "title" . }}Default Title{{ end }}</title>
+    <title>{{.Title}}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="preload" href="/static/fonts/nunito-v26-cyrillic_latin-regular.woff2" as="font" crossorigin>
 </head>
-<body>    
-   <!-- навигация -->
+
+<body>
+    <!-- навигация -->
     <nav class="navigation">
         <div class="navigation_section_1">
             <div class="navigation_logo">
@@ -18,13 +19,13 @@
             </div>
         </div>
         <ul class="navigation_list">
-            <li class="navigation_item"><button class="navigation_button navigation_button_active">Профиль</button>
+            <li class="navigation_item"><button id="mainButton" class="navigation_button">Профиль</button>
             </li>
-            <li class="navigation_item"><button id="patientsButton"  class="navigation_button">Пациенты</button>
+            <li class="navigation_item"><button id="tableButton" class="navigation_button">Пациенты</button>
             </li>
             <li class="navigation_item"><button class="navigation_button">Печать</button>
             </li>
-            <li class="navigation_item"><button class="navigation_button">Игры</button>
+            <li class="navigation_item"><button id="gamesButton" class="navigation_button">Игры</button>
             </li>
             <li class="navigation_item"><button class="navigation_button">Настройки</button>
             </li>
@@ -40,14 +41,14 @@
                         stroke-linejoin="round" />
                 </svg>
             </button>
-            <button class="profile_button navigation_profile">
+            <!-- <button class="profile_button navigation_profile">
                 <span class="circle-image">
                     <img src="/static/img/avatar.png">
                 </span>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M6 9L12 15L18 9" stroke="#2F3437" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round" />
-                </svg>
+                </svg> -->
             </button>
         </div>
 
@@ -55,12 +56,44 @@
     </nav>
     <!-- подгрузка main -->
     <main>
-        {{ template "main" . }}
-        
+        {{if eq .Content "game"}}
+        {{template "game-content" .}}
+        {{else if eq .Content "table"}}
+        {{template "patient-table" .}}
+        {{else if eq .Content "add"}}
+        {{template "add" .}}
+        {{else}}
+        {{template "main" .}}
+        {{end}}
+
     </main>
     <script>
-        document.getElementById('patientsButton').addEventListener('click', function() {
-            window.location.href = '/add-patient';
+        // document.getElementById('patientsButton').addEventListener('click', function() {
+        //     window.location.href = '/add-patient';
+        // });
+        var buttons = document.querySelectorAll('navigation_button');
+        function removeActiveClasses() {
+            buttons.forEach(function (button) {
+                button.classList.remove('active');
+            });
+        }
+        document.getElementById('gamesButton').addEventListener('click', function () {
+            window.location.href = '/game';
+            removeActiveClasses();
+            this.classList.add('active');
+        });
+        document.getElementById('mainButton').addEventListener('click', function () {
+            window.location.href = '/';
+            removeActiveClasses();
+            this.classList.add('active');
+        });
+        document.getElementById('tableButton').addEventListener('click', function () {
+            window.location.href = '/patient';
+            removeActiveClasses();
+            this.classList.add('active');
+        });
+        document.getElementById('addButton').addEventListener('click', function () {
+            window.location.href = '/add-patient';   
         });
     </script>
 </body>

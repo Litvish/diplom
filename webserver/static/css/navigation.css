@@ -29,7 +29,7 @@
     border-radius: 10%;
     
 }
-.navigation_button_active{
+.navigation_button:active{
     padding: 0px 8px 28px 8px ;
     border-bottom-width: 4px;
     border-bottom-style: solid;
