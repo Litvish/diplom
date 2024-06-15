@@ -1,8 +1,9 @@
-.profile_main{
+.profile_main {
     width: 97px;
     height: 97px;
 }
-.main_section_1{
+
+.main_section_1 {
     height: 320px;
     width: auto;
     display: flex;
@@ -11,37 +12,40 @@
     justify-items: center;
     flex-direction: column;
 }
-.main_nickname{
+
+.main_nickname {
     font-size: 35px;
     max-width: auto;
 }
-.main_section_2{
+
+.main_section_2 {
     display: flex;
     flex-wrap: wrap;
-    gap: 30px;
-    align-items: center;
+    gap: 40px;
     justify-content: center;
-    justify-items: center;
 
-    
+
+
 }
-.main_container{
-    width: 585px;
-    height: 285px;
-    display: flex;
+
+.main_container {
+    width: 300px;
+    height: 150px;
     border: 1px;
     border-color: #C8CDD0;
     border-style: solid;
     border-radius: 8px;
     padding: 28px;
     gap: 32px;
+    display: flex;
 }
-main{
+
+main {
     margin-left: 7%;
     margin-right: 7%;
 }
 
-.main_container_nickname{
+.main_container_nickname {
     width: 76px;
     height: 76px;
 
@@ -51,11 +55,14 @@ main{
 .green-button:hover {
     background-color: #45a049;
 }
+
 .green-button {
-    background-color: #4CAF50; /* Green */
+    background-color: #4CAF50;
+    /* Green */
     color: white;
     padding: 10px 20px;
-    margin-top: 10px; /* Adjust as needed */
+    margin-top: 10px;
+    /* Adjust as needed */
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -63,3 +70,48 @@ main{
     font-family: nunito;
     font-weight: 500;
 }
+
+h3 {
+    margin-top: 0;
+}
+
+p {
+    margin-bottom: 10px;
+}
+
+.button-blue {
+    background-color: #2196F3;
+    /* Blue */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    max-height: 40px;
+}
+
+.profile-pic img {
+    border-radius: 50%;
+    width: 80px;
+}
+.profile-pic {
+    float: left;
+    margin-right: 20px;
+  }
+  .container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin: 20px auto;
+    width: 300px;
+    height: 150px;
+    border:  5px;
+    display: block;
+    
+  }

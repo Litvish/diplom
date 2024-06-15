@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"time"
 )
 
 func initDB(connStr string) (*sql.DB, error) {
@@ -22,7 +23,7 @@ func initDB(connStr string) (*sql.DB, error) {
 }
 func getPatients(db *sql.DB) ([]Patient, error) {
 	var patients []Patient
-	query := `SELECT id, name, disease, avatar_url FROM patients`
+	query := `SELECT id, name, surname, disease, admission_time, attending_doctor FROM patients`
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err
@@ -30,9 +31,12 @@ func getPatients(db *sql.DB) ([]Patient, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var p Patient
-		if err := rows.Scan(&p.ID, &p.Name, &p.Disease, &p.AvatarURL); err != nil {
+		var admissionTime time.Time // Временная переменная для хранения времени
+		if err := rows.Scan(&p.ID, &p.Name, &p.Surname, &p.Disease, &admissionTime, &p.AttendingDoctor); err != nil {
 			return nil, err
 		}
+		// Форматируем время и сохраняем в поле AdmissionTime
+		p.AdmissionTime = admissionTime.Format("02.01.2006")
 		patients = append(patients, p)
 	}
 	if err = rows.Err(); err != nil {

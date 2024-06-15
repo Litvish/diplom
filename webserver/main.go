@@ -3,20 +3,18 @@ package main
 import (
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 )
 
 type Patient struct {
-	ID              int
-	Name            string
-	AdmissionTime   time.Time
-	GamesPlayed     []string
-	AttendingDoctor string
-	Disease         string
-	AvatarURL       string
+	ID              int    `json:"id"`
+	Name            string `json:"name"`
+	Surname         string `json:"surname"`
+	Disease         string `json:"disease"`
+	AdmissionTime   string `json:"admission_time"` // Теперь это строка
+	AttendingDoctor string `json:"attending_doctor"`
 }
 
 func main() {
@@ -37,7 +35,7 @@ func main() {
 
 		patients, err := getPatients(db)
 		if err != nil {
-			// c.AbortWithError(http.StatusInternalServerError, err)
+			c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 		c.HTML(http.StatusOK, "template.html", gin.H{
@@ -97,10 +95,15 @@ func main() {
 		})
 	})
 	router.GET("/patient", AuthMiddleware(), func(c *gin.Context) {
-
+		patients, err := getPatients(db)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
 		c.HTML(http.StatusOK, "template.html", gin.H{
-			"Title":   "patients",
-			"Content": "table",
+			"Title":    "patients",
+			"Content":  "table",
+			"Patients": patients,
 		})
 	})
 	router.GET("/add-patient", AuthMiddleware(), func(c *gin.Context) {
@@ -110,6 +113,7 @@ func main() {
 			"Content": "add",
 		})
 	})
+	router.POST("/add-patient", AuthMiddleware(), addPatientHandler(db))
 
 	// Обработчик для статических файлов
 	router.Static("/static", "./static")

@@ -76,7 +76,7 @@ func CheckUserPassword(db *sql.DB, surname, name, password string) (bool, error)
 // GenerateJWT создает и подписывает новый JWT токен для пользователя
 func GenerateJWT(surname, name string) (string, error) {
 	// Устанавливаем время истечения токена
-	expirationTime := time.Now().Add(5 * time.Minute)
+	expirationTime := time.Now().Add(50 * time.Minute)
 	//log.Printf("Generating JWT for user: %s %s with expiration time: %v", surname, name, expirationTime)
 
 	// Создаем новые утверждения (claims) с информацией о пользователе и временем истечения
@@ -133,7 +133,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// Токен действителен, сохраняем информацию о пользователе в контексте
+		// Токен действителен, сохраняем информацию о пользователе в кxонтексте
 		log.Printf("Authenticated user: %s %s", claims.Surname, claims.Name)
 		c.Set("userInfo", claims)
 

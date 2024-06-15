@@ -26,92 +26,22 @@
             </tr>
         </thead>
         <tbody>
+            {{ range .Patients }}
             <tr>
-                <td>Lorem Ipsum</td>
-                <td>Dr. Ipsum</td>
-                <td>Infiera</td>
-                <td>10.120.000</td>
-                <td>20/05/2024</td>
+                <td>{{ .Name }} {{ .Surname }}</td>
+                <td>{{ .AttendingDoctor }}</td>
+                <td>{{ .Disease }}</td>
+                <td>1</td>
+                <td>{{ .AdmissionTime}}</td>
                 <td class="actions">
                     <button class="edit">✎</button>
                     <button class="details">...</button>
                     <button class="delete">🗑</button>
                 </td>
             </tr>
+            {{ end }}
             <tr>
-                <td>Lorem Ipsum</td>
-                <td>Dr. Ipsum</td>
-                <td>Infiera</td>
-                <td>10.120.000</td>
-                <td>20/05/2024</td>
-                <td class="actions">
-                    <button class="edit">✎</button>
-                    <button class="details">...</button>
-                    <button class="delete">🗑</button>
-                </td>
-            </tr>
-            <tr>
-                <td>Lorem Ipsum</td>
-                <td>Dr. Ipsum</td>
-                <td>Infiera</td>
-                <td>10.120.000</td>
-                <td>20/05/2024</td>
-                <td class="actions">
-                    <button class="edit">✎</button>
-                    <button class="details">...</button>
-                    <button class="delete">🗑</button>
-                </td>
-            </tr>
-            <tr>
-                <td>Lorem Ipsum</td>
-                <td>Dr. Ipsum</td>
-                <td>Infiera</td>
-                <td>10.120.000</td>
-                <td>20/05/2024</td>
-                <td class="actions">
-                    <button class="edit">✎</button>
-                    <button class="details">...</button>
-                    <button class="delete">🗑</button>
-                </td>
-            </tr>
-            <tr>
-                <td>Lorem Ipsum</td>
-                <td>Dr. Ipsum</td>
-                <td>Infiera</td>
-                <td>10.120.000</td>
-                <td>20/05/2024</td>
-                <td class="actions">
-                    <button class="edit">✎</button> <button class="details">...</button> <button
-                        class="delete">🗑</button>
-                </td>
-            </tr>
-            <tr>
-                <td>Lorem Ipsum</td>
-                <td>Dr. Ipsum</td>
-                <td>Infiera</td>
-                <td>10.120.000</td>
-                <td>20/05/2024</td>
-                <td class="actions"> <button class="edit">✎</button> <button class="details">...</button> <button
-                        class="delete">🗑</button> </td>
-            </tr>
-            <tr>
-                <td>Lorem Ipsum</td>
-                <td>Dr. Ipsum</td>
-                <td>Infiera</td>
-                <td>10.120.000</td>
-                <td>20/05/2024</td>
-                <td class="actions"> <button class="edit">✎</button> <button class="details">...</button> <button
-                        class="delete">🗑</button> </td>
-            </tr>
-            <tr>
-                <td>Lorem Ipsum</td>
-                <td>Dr. Ipsum</td>
-                <td>Infiera</td>
-                <td>10.120.000</td>
-                <td>20/05/2024</td>
-                <td class="actions"> <button class="edit">✎</button> <button class="details">...</button> <button
-                        class="delete">🗑</button> </td>
-            </tr>
+                
         </tbody>
 
     </table>

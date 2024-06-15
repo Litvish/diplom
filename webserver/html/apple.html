@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apple Catch Game</title>
+<style>
+  canvas {
+    border: 1px solid black;
+    display: block;
+    margin: 0 auto;
+    background: #f4f4f4;
+  }
+  #menuCanvas {
+  display: block;
+  margin: 0 auto;
+  background: #f4f4f4;
+}
+.menuButton {
+  width: 100px;
+  height: 100px;
+  margin-right: 28px;
+  border-radius: 50%; /* Делает кнопки круглыми */
+  background-color: rgba(255, 255, 255, .0); /* Прозрачный белый фон */
+  border: none; /* Убирает стандартную рамку */
+  cursor: pointer; /* Меняет курсор при наведении */
+  outline: none; /* Убирает контур при фокусе */
+  box-shadow: 1px 4px 0px #42210B; /* Тень, как у прямоугольника */
+}
+
+.menuButton:last-child {
+  margin-right: 0; /* У последней кнопки не должно быть отступа справа */
+}
+</style>
+</head>
+<body>
+<canvas id="gameCanvas" width="1356" height="600"></canvas>
+<div id="menuContainer" style="width: 1356px; margin: auto; position: relative;">
+    <img src="menu.png" alt="Menu" style="width: 100%; display: block;">
+    <div id="scoreBox" style="
+      box-sizing: border-box;
+      background: linear-gradient(0deg, #890D05 0%, #FF7F04 100%);
+      border: 0.5px solid #281208;
+      box-shadow: 1px 4px 0px #42210B;
+      border-radius: 6px;
+      position: absolute;
+      left: 30px;
+      bottom: 15px;
+      width: 195px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 75px;
+      color: white;
+    ">
+      0 <!-- Сюда будет вставляться счет -->
+    </div>
+    <!-- Кнопки -->
+    <div style="position: absolute; left: 465px; bottom: 15px;">
+      <button class="menuButton" onclick="buttonAction1()">Button 1</button>
+      <button class="menuButton" onclick="buttonAction2()">Button 2</button>
+      <button class="menuButton" onclick="buttonAction3()">Button 3</button>
+    </div>
+  </div>
+
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+// Параметры игры
+const appleWidth = 100; // Ширина яблока
+const appleHeight = 100; // Высота яблока
+const basketWidth = 215; // Ширина корзинки
+const basketHeight = 95; // Высота корзинки
+let basketX = (canvas.width - basketWidth) / 2; // Начальное положение корзинки
+let score = 0; // Счет
+
+// Массив яблок
+let apples = [];
+
+// Загрузка изображений
+const backgroundImage = new Image();
+const appleImage = new Image();
+const basketImage = new Image();
+
+let imagesLoaded = 0;
+function imageLoaded() {
+  imagesLoaded++;
+  if (imagesLoaded === 3) {
+    startGame(); // Начать игру после загрузки всех изображений
+  }
+}
+
+backgroundImage.onload = imageLoaded;
+appleImage.onload = imageLoaded;
+basketImage.onload = imageLoaded;
+
+backgroundImage.src = 'Background.png'; // Укажите правильный путь к вашему изображению
+appleImage.src = 'apple.png'; // Укажите правильный путь к изображению яблока
+basketImage.src = 'bucket.png'; // Укажите правильный путь к изображению корзинки
+
+// Функция для создания яблока
+function createApple() {
+  const minX = (canvas.width - 1066) / 2 + appleWidth / 2; // Левая граница центральной области
+  const maxX = minX + 1066 - appleWidth; // Правая граница центральной области
+  const x = Math.random() * (maxX - minX) + minX;
+  const y = -appleHeight;
+  const dy = 2 + Math.random() * 3; // Скорость падения яблока
+  apples.push({ x, y, dy });
+}
+
+// Функция для обновления позиции корзинки
+function updateBasketPosition(event) {
+  const rect = canvas.getBoundingClientRect();
+  const root = document.documentElement;
+  const mouseX = event.clientX - rect.left - root.scrollLeft;
+  basketX = mouseX - basketWidth / 2;
+  if (basketX < 0) basketX = 0;
+  if (basketX + basketWidth > canvas.width) basketX = canvas.width - basketWidth;
+}
+
+// Функция для начала игры
+function startGame() {
+  setInterval(createApple, 1000); // Добавляем яблоко каждую секунду
+  updateGame(); // Запускаем игровой цикл
+}
+
+// Функция для обновления игры
+function updateGame() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height); // Очищаем canvas
+
+  // Обновляем и рисуем яблоки
+  for (let i = apples.length - 1; i >= 0; i--) {
+    const apple = apples[i];
+    apple.y += apple.dy;
+
+    // Удаляем яблоко, если оно упало на землю
+    if (apple.y > canvas.height) {
+      apples.splice(i, 1);
+    } else {
+      // Рисуем яблоко
+      ctx.drawImage(appleImage, apple.x, apple.y, appleWidth, appleHeight);
+    }
+  }
+
+  // Отрисовываем фоновое изображение поверх яблок
+  ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+
+  // Рисуем корзинку
+  ctx.drawImage(basketImage, basketX, canvas.height - basketHeight, basketWidth, basketHeight);
+
+ // Проверяем, поймали ли мы яблоко
+for (let i = apples.length - 1; i >= 0; i--) {
+  const apple = apples[i];
+  // Проверяем, находится ли нижняя часть яблока ниже верхней части корзинки
+  if (apple.y + appleHeight >= canvas.height - basketHeight) {
+    // Проверяем, пересекается ли яблоко с корзинкой по горизонтали
+    if (apple.x < basketX + basketWidth && apple.x + appleWidth > basketX) {
+      score++;
+      apples.splice(i, 1); // Удаляем пойманное яблоко из массива
+    } else if (apple.y + appleHeight > canvas.height) {
+      apples.splice(i, 1); // Удаляем яблоко, если оно упало на землю
+    }
+  }
+}
+
+function updateScore(score) {
+  const scoreBox = document.getElementById('scoreBox');
+  scoreBox.textContent = score; // Обновляем текст счета
+}
+
+// В вашем игровом коде, вызывайте эту функцию каждый раз, когда счет изменяется:
+updateScore(score);
+
+  requestAnimationFrame(updateGame); // Запрашиваем следующий кадр
+}
+
+// Обработчик событий мыши
+canvas.addEventListener('mousemove', updateBasketPosition);
+
+</script>
+</body>
+</html>

@@ -6,7 +6,7 @@
 </head>
 <body>
 <h1>Добавить пациента</h1>
-  <form>
+  <form action="/add-patient" method="post">
     <label for="name">Имя:</label><br>
     <input type="text" id="name" name="name" ><br>
 
@@ -15,9 +15,6 @@
 
     <label for="Disease">Болезнь:</label><br>
     <input type="text" id="text" name="Disease" value=""><br>
-
-    <label for="AttendingDoctor">Лечащий врач</label><br>
-    <input type="text" id="AttendingDoctor" name="AttendingDoctor" value=""><br>
 
     <input type="submit" value="Регистрация">
   </form>
